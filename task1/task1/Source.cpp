@@ -33,10 +33,7 @@ int main(int argc, char **argv)
 		for (int i = 0; i < size - 1; i++)
 		{
 			MPI_Recv(&tmp, 1, MPI_DOUBLE, MPI_ANY_SOURCE, tag, MPI_COMM_WORLD, &status);
-			cout <<'!'<<tmp<<'!';
 			ans += tmp;
-			cout << ans << '!';
-		}
 		cout << "ans = " << ans <<'\n';
 	}
 //	cout << "The number of processes: " << size << " my number is " << rank << '\n';
