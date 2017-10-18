@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	std::mt19937_64 gen(time(0));
-	std::uniform_real_distribution<> genFromAtoB(a + rank*(b - a)/(double)size, a + (rank+1)*(b - a) / (double)size);
+	std::mt19937_64 const gen(time(0));
+	std::uniform_real_distribution<> const genFromAtoB(a + rank*(b - a)/(double)size, a + (rank+1)*(b - a) / (double)size);
 
 	startTime = MPI_Wtime();
 	int delta = getDelta(numPoint, size, rank);	
