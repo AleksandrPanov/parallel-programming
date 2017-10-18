@@ -13,12 +13,16 @@ inline int getDelta(int numPoint, int size, int rank)
 	int delta = (numPoint % size) - rank;
 	return delta > 0;
 }
+inline double fx(double x)
+{
+	return x;
+}
 using CalculateFunc = double(double x);
-CalculateFunc *funcAr[2] = {sin, cos};
+CalculateFunc *funcAr[3] = {sin, cos, fx};
 int main(int argc, char **argv)
 {
-	int rank, size, numPoint = 1000000, numFunc = 0;
-	double ans = 0, a = -10*pi, b = 10*pi;
+	int rank, size, numPoint = 100000000, numFunc = 0;
+	double ans = 0, a = -10*pi, b = 10*pi, startTime;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -26,9 +30,8 @@ int main(int argc, char **argv)
 
 	std::mt19937_64 gen(time(0));
 	std::uniform_real_distribution<> genFromAtoB(a + rank*(b - a)/(double)size, a + (rank+1)*(b - a) / (double)size);
-	//std::uniform_real_distribution<> genFromAtoB(a,b);
 
-
+	startTime = MPI_Wtime();
 	int delta = getDelta(numPoint, size, rank);	
 
 	double sum = 0;
@@ -39,7 +42,6 @@ int main(int argc, char **argv)
 	}
 	sum /= numPoint;
 
-	//cout << numPoint / size + delta<< ' ' <<sum<< " count sum\n";
 	if (rank != 0)
 		MPI_Send(&sum, 1, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD);
 	else
@@ -53,9 +55,8 @@ int main(int argc, char **argv)
 			ans += tmp;
 		}
 		ans *= (b - a);
-		cout << "ans = " << ans <<'\n';
+		cout << "time = "<< MPI_Wtime() - startTime <<" ans = " << ans <<'\n';
 	}
-//	cout << "The number of processes: " << size << " my number is " << rank << '\n';
 	MPI_Finalize();
 	return 0;
 }
