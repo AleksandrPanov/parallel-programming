@@ -23,7 +23,7 @@ int main()
 {
 	Matrix A, f, x1, f1;
 	cin >> A >> f;
-	int m = 3;
+	int m = 2;
 	Matrix x0(f.gRow(), 1);
 	for (int i = 0; i < m; i++)
 	{
