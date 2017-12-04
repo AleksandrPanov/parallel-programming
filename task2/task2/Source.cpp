@@ -43,6 +43,11 @@ void createSendedStructX(int numRows, SendedRow &sendedRow, double* dataX, int c
 	for (int i = 0; i < numRows; i++)
 		sendedRow.row[i+curRow] = dataX[i+curRow];
 }
+void createSendedResX(int numRows, SendedRow &sendedRow, double* dataX)
+{
+	for (int i = 0; i < numRows; i++)
+		sendedRow.row[i] = dataX[i];
+}
 Matrix getF(Matrix &m, Matrix &x0, Matrix &f, int start)			  //(0 x2) * -xx1 + f1 
 {																	  //(0  0) * -xx2 + f2
 
@@ -51,7 +56,6 @@ Matrix getF(Matrix &m, Matrix &x0, Matrix &f, int start)			  //(0 x2) * -xx1 + f
 	Matrix newF(row, 1);
 	for (int i = 0; i < row; i++)
 	{
-		//if (start == 0 && i == 0) cout << m;
 		newF[i][0] += f[i][0];
 		for (int j = start+i+1; j < col; j++)
 			newF[i][0] -= m[i][j]* x0[j][0];
@@ -69,10 +73,15 @@ void unPackAF(SendedRow &mySendedRow, MPI_Status &status, int &row, int &numRow,
 	A = Matrix(numRow, row, pA);
 	F = Matrix(numRow, 1, pF);
 }
-void unPackX(SendedRow &mySendedRow, MPI_Status &status,  int &numRow, int &curRow, int row, Matrix &X)
+void unPackX(SendedRow &mySendedRow, int &numRow, int &curRow, int row, Matrix &X)
 {
 	numRow = mySendedRow.numRow;
 	curRow = mySendedRow.curRow;
+	double *pF = mySendedRow.row;
+	X = Matrix(row, 1, pF);
+}
+void unPackResX(SendedRow &mySendedRow, int row, Matrix &X)
+{
 	double *pF = mySendedRow.row;
 	X = Matrix(row, 1, pF);
 }
@@ -115,7 +124,7 @@ int main(int argc, char **argv)
 {
 	Matrix startA, tmpF;
 	Matrix A, F, x0, x1;
-	int rank, nProc, row , curRow, numRow, nRep = 2;
+	int rank, nProc, row , curRow, numRow, nRep = 20;
 	double *startData;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &nProc);
@@ -161,14 +170,27 @@ int main(int argc, char **argv)
 		for (int i = 0; i < rank; i++)
 		{
 			MPI_Recv(&mySendedRow, 1, sendedRow, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-			unPackX(mySendedRow, status, tRow, tCurRow, row, tX);
+			unPackX(mySendedRow, tRow, tCurRow, row, tX);
 			setTX(tX, x1, tCurRow, tRow);
 			setFByX(A, tX, F, tCurRow, tRow);
 		}
 		setX(A, F, x1, x0, curRow, numRow);
 		createSendedStructX(numRow, mySendedRow, x1.getpA(), curRow);
+
 		for (int i = rank + 1; i < nProc; i++)
+		{
 			MPI_Isend(&mySendedRow, 1, sendedRow, i, tag, MPI_COMM_WORLD, request);
+		}
+		//отправляем результат
+		if (rank == nProc - 1)
+		{
+			createSendedResX(row, mySendedRow, x1.getpA());
+		}
+		MPI_Bcast(&mySendedRow, 1, sendedRow, nProc-1, MPI_COMM_WORLD);
+		if (rank != nProc - 1)
+		{
+			unPackResX(mySendedRow, row, x0);
+		}
 	}
 	if (rank == nProc - 1)	
 		cout << x1;
