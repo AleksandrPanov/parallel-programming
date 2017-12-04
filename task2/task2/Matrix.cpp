@@ -25,13 +25,13 @@ Matrix::Matrix(int row, int col)
 	vv = vector<double>(row*col);
 }
 
-Matrix::Matrix(int row, int col, double val): Matrix(row, col)
+Matrix::Matrix(int row, int col, double val) : Matrix(row, col)
 {
 	for (int i = 0; i < row*col; i++)
-			vv[i] = val;
+		vv[i] = val;
 }
 
-Matrix::Matrix(int r, int c, double * p): row(r), col(c)
+Matrix::Matrix(int r, int c, double * p) : row(r), col(c)
 {
 	vv = vector<double>(p, p + row*col);
 }

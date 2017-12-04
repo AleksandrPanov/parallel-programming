@@ -124,8 +124,7 @@ int main(int argc, char **argv)
 {
 	Matrix startA, tmpF;
 	Matrix A, F, x0, x1;
-	int rank, nProc, row , curRow, numRow, nRep = 20;
-	double *startData;
+	int rank, nProc, row , curRow, numRow, nRep = 200000;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &nProc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -137,6 +136,7 @@ int main(int argc, char **argv)
 	if (rank == 0)
 	{
 		//read file
+		double *startData;
 		startData = readSystem(row);
 		startA = A = Matrix(row, row, startData);
 		F = Matrix(row, 1, startData + row*row);
@@ -161,10 +161,10 @@ int main(int argc, char **argv)
 	}
 	x1 = Matrix(row, 1);
 	x0 = x1;
+	double startTime = MPI_Wtime();
 	for (int z = 0; z < nRep; z++)
 	{
 		F = getF(A, x0, tmpF, curRow);
-		//cout <<"r "<<rank<<" "<< F;
 		Matrix tX; // taken x
 		int tRow, tCurRow;
 		for (int i = 0; i < rank; i++)
@@ -192,8 +192,10 @@ int main(int argc, char **argv)
 			unPackResX(mySendedRow, row, x0);
 		}
 	}
-	if (rank == nProc - 1)	
-		cout << x1;
+	if (rank == nProc - 1)
+	{
+		cout <<"answer:\n"<< x1<<"time = "<<MPI_Wtime() - startTime<<'\n';
+	}
 	
 	clearStruct(sendedRow);
 	MPI_Finalize();
