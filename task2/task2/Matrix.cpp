@@ -36,22 +36,6 @@ Matrix::Matrix(int r, int c, double * p) : row(r), col(c)
 	vv = vector<double>(p, p + row*col);
 }
 
-double * Matrix::getBuf()
-{
-	double *p = new double[row*col + 2];
-	for (int i = 0; i < row*col; i++)
-		p[i + 2] = vv[i];
-	return p;
-}
-
-double * Matrix::geEasytBuf()
-{
-	double *p = new double[row*col];
-	for (int i = 0; i < row*col; i++)
-		p[i] = vv[i];
-	return p;
-}
-
 double * Matrix::getpA()
 {
 	return &vv[0];

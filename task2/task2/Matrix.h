@@ -14,8 +14,6 @@ public:
 	Matrix(int row, int col, double val);
 	Matrix(int r, int c, double *p);
 
-	double *getBuf();
-	double *geEasytBuf();
 	double *getpA();
 	double* operator [] (int i);
 	Matrix operator * (Matrix& m);
