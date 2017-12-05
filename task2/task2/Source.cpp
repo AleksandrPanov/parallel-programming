@@ -136,6 +136,7 @@ int main(int argc, char **argv)
 	if (rank == 0)
 	{
 		//read file
+		//cout << Matrix::createDiagDominMatrix(10, 0, 1);
 		double *startData;
 		startData = readSystem(row);
 		startA = A = Matrix(row, row, startData);

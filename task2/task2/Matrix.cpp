@@ -1,6 +1,8 @@
 #include "Matrix.h"
 #include <algorithm>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
 int Matrix::gRow() const
@@ -72,6 +74,25 @@ Matrix Matrix::operator/(double val)
 	for (int i = 0; i < gRow(); i++)
 		for (int j = 0; j < gCol(); j++)
 			m[i][j] = (*this)[i][j] / val;
+	return m;
+}
+
+Matrix Matrix::createDiagDominMatrix(int n, int min, int max)
+{
+	Matrix m(n, n);
+	srand(time(0));
+	for (int i = 0; i < n; i++)
+	{
+		int sum = 0;
+		for (int j = 0; j < n; j++)
+			if (j != i)
+			{
+				int el = rand() % (max - min + 1) + min;
+				m[i][j] = el;
+				sum += abs(el);
+			}
+		m[i][i] = sum + rand() % (max - min + 1);
+	}
 	return m;
 }
 

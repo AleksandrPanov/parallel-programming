@@ -20,4 +20,6 @@ public:
 	Matrix operator * (double val);
 	Matrix operator / (double val);
 	friend std::ostream& operator<<(std::ostream& os, Matrix& m);
+
+	static Matrix createDiagDominMatrix(int n, int min, int max);
 };
