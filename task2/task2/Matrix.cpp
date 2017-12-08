@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 using namespace std;
 
 int Matrix::gRow() const
@@ -43,6 +44,11 @@ double * Matrix::getpA()
 	return &vv[0];
 }
 
+double& Matrix::vec(int i)
+{
+	return vv[i];
+}
+
 double* Matrix::operator[](int i)
 {
 	return &vv[i*col];
@@ -77,10 +83,19 @@ Matrix Matrix::operator/(double val)
 	return m;
 }
 
+std::ofstream & Matrix::getOstreamVector(std::ofstream& os)
+{
+
+	for (int i = 0; i < gRow(); i++)
+		os << vec(i) << ' ';
+	return os;
+}
+
 Matrix Matrix::createDiagDominMatrix(int n, int min, int max)
 {
 	Matrix m(n, n);
-	srand(time(0));
+	auto t = time(0);
+	srand(0);
 	for (int i = 0; i < n; i++)
 	{
 		int sum = 0;
@@ -94,6 +109,19 @@ Matrix Matrix::createDiagDominMatrix(int n, int min, int max)
 		m[i][i] = sum + rand() % (max - min + 1);
 	}
 	return m;
+}
+
+Matrix Matrix::createVector(int n, int min, int max)
+{
+	Matrix vec(n, 1);
+	auto t = time(0);
+	srand(0);
+	for (int i = 0; i < n; i++)
+	{
+		int el = rand() % (max - min + 1) + min;
+		vec.vec(i) = el;
+	}
+	return vec;
 }
 
 std::ostream & operator<<(std::ostream & os, Matrix & m)

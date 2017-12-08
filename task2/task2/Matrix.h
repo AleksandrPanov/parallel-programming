@@ -15,11 +15,14 @@ public:
 	Matrix(int r, int c, double *p);
 
 	double *getpA();
+	double& vec(int i);
 	double* operator [] (int i);
 	Matrix operator * (Matrix& m);
 	Matrix operator * (double val);
 	Matrix operator / (double val);
+	std::ofstream& getOstreamVector(std::ofstream& os);
 	friend std::ostream& operator<<(std::ostream& os, Matrix& m);
 
 	static Matrix createDiagDominMatrix(int n, int min, int max);
+	static Matrix createVector(int n, int min, int max);
 };
