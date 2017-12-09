@@ -26,12 +26,10 @@ class FourierFunction
 	double *B = nullptr;
 	int n;
 	int m;
+	double a;
+	double b;
 public:
 	FourierFunction(){}
-	double getMemberSeries(int i, double x) const
-	{
-		return A[i] * cos(i*x) + B[i] * sin(i*x);
-	}
 	void setFunction(int n, int m, double *A, double *B)
 	{
 		delete[] A;
@@ -40,6 +38,49 @@ public:
 		this->m = m;
 		this->A = A;
 		this->B = B;
+	}
+	double getMemberSeries(int i, double x) const
+	{
+		return A[i] * cos(i*x) + B[i] * sin(i*x);
+	}
+	double getA0(double *y)
+	{
+		double A0 = 0, x = a, delta = (b - a) / n;
+		for (int j = 0; j < m; j++)
+			A0 += y[j];
+		A0 *= (2.0 / m);
+		return A0;
+	}
+	double getA(int i, double *y)
+	{
+		double A = 0, x = a, delta = (b-a)/n;
+		for (int j = 0; j < m; j++)
+		{
+			A += y[j] * cos(i*x);
+			x += delta;
+		}
+		A *= (2.0/pi);
+		return A;
+	}
+	double getB(int i, double *y)
+	{
+		double B = 0, x = a, delta = (b - a) / n;
+		for (int j = 0; j < m; j++)
+		{
+			B += y[j] * sin(i*x);
+			x += delta;
+		}
+		B *= (2.0 / pi);
+		return B;
+	}
+	void setCoff(double *y)
+	{
+		A[0] = getA0(y);
+		for (int i = 1; i < n; i++)
+		{
+			A[i] = getA(i, y);
+			B[i] = getB(i, y);
+		}
 	}
 	double calculate(double x) const
 	{
@@ -57,6 +98,6 @@ public:
 //double getPoint(double x, )
 int main()
 {
-
+	FourierFunction f;
 	return 0;
 }
