@@ -1,82 +1,84 @@
 #include <iostream>
+#include <vector>
 #include <cassert>
 #include <cmath>
+#include "read_write.h"
 using namespace std;
-const double pi = 3.14159265359;
+const double pi = 3.14159265358979323846;
 using func = double(double);
-void setPointFunct(int n, double l, double r, double *ar, func f)
+func *f = sin;
+func *g = [](double x){return x; };
+vector<double> setPointFunct(int n, double l, double r, func f)
 {
 	assert(n > 1);
-	ar = new double[n];
-	double delta = (r - l) / n;
+	vector<double>ar(n);
+	double delta = (r - l) / (n-1);
 	double start = l;
 	for (int i = 0; i < n; i++)
 	{
 		ar[i] = f(start);
 		start += delta;
 	}
+	return move(ar);
 }
-void setCoefFourier(int n, int m, double *A, double *B)
-{
 
-}
 class FourierFunction
 {
-	double *A = nullptr;
-	double *B = nullptr;
+	vector<double> A;
+	vector<double> B;
 	int n;
 	int m;
-	double a;
-	double b;
+	double start;
+	double end;
+	double gd(int n)
+	{
+		return 2 * pi / (n - 1);
+	}
 public:
 	FourierFunction(){}
-	void setFunction(int n, int m, double *A, double *B)
+	void changeX(double &x) const
 	{
-		delete[] A;
-		delete[] B;
-		this->n = n;
-		this->m = m;
-		this->A = A;
-		this->B = B;
+
 	}
 	double getMemberSeries(int i, double x) const
 	{
 		return A[i] * cos(i*x) + B[i] * sin(i*x);
 	}
-	double getA0(double *y)
+	double getA0(const double *y)
 	{
-		double A0 = 0, x = a, delta = (b - a) / n;
-		for (int j = 0; j < m; j++)
+		double A0 = 0, x = 0, delta = gd(n);
+		for (int j = 0; j < n; j++)
 			A0 += y[j];
-		A0 *= (2.0 / m);
+		A0 *= (2.0 / n);
 		return A0;
 	}
-	double getA(int i, double *y)
+	double getA(int i, const double *y)
 	{
-		double A = 0, x = a, delta = (b-a)/n;
-		for (int j = 0; j < m; j++)
+		double A = 0;
+		for (int j = 0; j < n; j++)
 		{
-			A += y[j] * cos(i*x);
-			x += delta;
+			A += y[j] * cos(i *j * 2 * pi / n);
 		}
-		A *= (2.0/pi);
+		A *= (2.0/n);
 		return A;
 	}
-	double getB(int i, double *y)
+	double getB(int i, const double *y)
 	{
-		double B = 0, x = a, delta = (b - a) / n;
-		for (int j = 0; j < m; j++)
+		double B = 0;
+		for (int j = 0; j < n; j++)
 		{
-			B += y[j] * sin(i*x);
-			x += delta;
+			B += y[j] * sin(i * j * 2 * pi / n);
 		}
-		B *= (2.0 / pi);
+		B *= (2.0 / n);
 		return B;
 	}
-	void setCoff(double *y)
+	void setCoeff(int n, int m, const double *y)
 	{
-		A[0] = getA0(y);
-		for (int i = 1; i < n; i++)
+		this->n = n;
+		this->m = m;
+		A = vector<double>(m+1);
+		B = vector<double>(m+1);
+		for (int i = 0; i <= m; i++)
 		{
 			A[i] = getA(i, y);
 			B[i] = getB(i, y);
@@ -84,20 +86,40 @@ public:
 	}
 	double calculate(double x) const
 	{
+		changeX(x);
 		double res = A[0] / 2;
-		for (int i = 1; i < n; i++)
+		for (int i = 1; i <= m; i++)
 			res += getMemberSeries(i, x);
 		return res;
 	}
-	~FourierFunction()
+	void setPoints(int n, vector<double> &v, double start, double end)
 	{
-		delete[] A;
-		delete[] B;
+		v = vector<double>(n);
+		double x = start, delta = gd(n);
+		for (int i = 0; i < n; i++)
+		{
+			v[i] = calculate(x);
+			x += delta;
+		}
 	}
 };
-//double getPoint(double x, )
 int main()
 {
-	FourierFunction f;
+	int n = 255;
+	vector<double> ar = setPointFunct(n, 0, 2 * pi, sin);
+	
+	ofstream of;
+	openForWrite(of, "sinX", true);
+	writePoints(n, &ar[0], of);
+	of.close();
+	FourierFunction fourierFunction;
+	int m = n/2;
+
+	fourierFunction.setCoeff(n, m, &ar[0]);
+	fourierFunction.setPoints(n, ar, 0, 2 * pi);
+	openForWrite(of, "sinXFourier", true);
+	writePoints(n, &ar[0], of);
+	
+	of.close();
 	return 0;
 }
