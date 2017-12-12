@@ -30,6 +30,8 @@ class FourierFunction
 	int m;
 	double start;
 	double end;
+	double normCoeff =1.0;
+	double normTerm = 0;
 	double gd(int n)
 	{
 		return 2 * pi / n;
@@ -38,7 +40,8 @@ public:
 	FourierFunction(){}
 	void changeX(double &x) const
 	{
-
+		x += normTerm;
+		x *= normCoeff;
 	}
 	double getMemberSeries(int i, double x) const
 	{
@@ -95,7 +98,9 @@ public:
 	void setPoints(int n, vector<double> &v, double start, double end)
 	{
 		v = vector<double>(n);
-		double x = start, delta = gd(n);
+		this->start = start;
+		this->end = end;
+		double x = 0, delta = gd(n);
 		for (int i = 0; i < n; i++)
 		{
 			v[i] = calculate(x);
@@ -106,7 +111,7 @@ public:
 int main()
 {
 	int n = 100;
-	vector<double> ar = setPointFunct(n, 0, 2 * pi, g);
+	vector<double> ar = setPointFunct(n, 0, 2 * pi, sin);
 	
 	ofstream of;
 	openForWrite(of, "sinX", true);
@@ -117,8 +122,8 @@ int main()
 
 	fourierFunction.setCoeff(n, m, &ar[0]);
 	fourierFunction.setPoints(n, ar, 0, 2 * pi);
-	//openForWrite(of, "sinXFourier", true);
-	//writePoints(n, &ar[0], of);
+	openForWrite(of, "sinXFourier", true);
+	writePoints(n, &ar[0], of);
 	
 	cout << fourierFunction.calculate(1);
 

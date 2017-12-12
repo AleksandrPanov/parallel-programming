@@ -75,7 +75,7 @@ void readData(Matrix& A, Matrix& F, Matrix& x0, Matrix& x1, Matrix& startF,
 	int &rank, int &nProc, int &row, int &curRow, int& numRow, char *r,
 	MPI_Datatype& sendedMatrix, SendedMatrix& mySendedMatrix, MPI_Status &status)
 {
-	cout << "i work1\n";
+	cout << rank<<" i work1\n";
 	if (rank == 0)
 	{
 		//read file
@@ -118,10 +118,11 @@ int main(int argc, char **argv)
 	SendedRow mySendedRow;
 	SendedMatrix mySendedMatrix;
 	prepareStruct(sendedRow, sendedMatrix);
-	writeSystem(tRead, 600, 0, 1);
-	readData(A, F, x0, x1, startF, rank, nProc, row, curRow, numRow, tRead, sendedMatrix, mySendedMatrix, status);
+	//writeSystem(tRead, 600, 0, 1);
+	readData(A, F, x0, x1, startF, rank, nProc, row, curRow, numRow, read, sendedMatrix, mySendedMatrix, status);
 	double startTime = MPI_Wtime();
 	MPI_Type_free(&sendedMatrix);
+	
 	for (int z = 0; z < nRep; z++)
 	{
 		F = getF(A, x0, startF, curRow);
