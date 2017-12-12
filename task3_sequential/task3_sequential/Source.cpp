@@ -12,7 +12,7 @@ vector<double> setPointFunct(int n, double l, double r, func f)
 {
 	assert(n > 1);
 	vector<double>ar(n);
-	double delta = (r - l) / (n-1);
+	double delta = (r - l) / n;
 	double start = l;
 	for (int i = 0; i < n; i++)
 	{
@@ -32,7 +32,7 @@ class FourierFunction
 	double end;
 	double gd(int n)
 	{
-		return 2 * pi / (n - 1);
+		return 2 * pi / n;
 	}
 public:
 	FourierFunction(){}
@@ -105,8 +105,8 @@ public:
 };
 int main()
 {
-	int n = 255;
-	vector<double> ar = setPointFunct(n, 0, 2 * pi, sin);
+	int n = 100;
+	vector<double> ar = setPointFunct(n, 0, 2 * pi, g);
 	
 	ofstream of;
 	openForWrite(of, "sinX", true);
@@ -117,9 +117,11 @@ int main()
 
 	fourierFunction.setCoeff(n, m, &ar[0]);
 	fourierFunction.setPoints(n, ar, 0, 2 * pi);
-	openForWrite(of, "sinXFourier", true);
-	writePoints(n, &ar[0], of);
+	//openForWrite(of, "sinXFourier", true);
+	//writePoints(n, &ar[0], of);
 	
-	of.close();
+	cout << fourierFunction.calculate(1);
+
+	//of.close();
 	return 0;
 }
