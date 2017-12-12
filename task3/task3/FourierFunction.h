@@ -1,41 +1,20 @@
-#include <iostream>
-#include <vector>
-#include <cassert>
-#include <cmath>
-#include "read_write.h"
-using namespace std;
-const double pi = 3.14159265358979323846;
+#pragma once
+#include "vec.h"
+double const pi = 3.14159265358979323846;
 using func = double(double);
-func *f = sin;
-func *g = [](double x)
-{
-	if (x < pi)
-	return x;
-	else return 2 * pi - x;
-};
-vector<double> setPointFunct(int n, double l, double r, func f)
-{
-	assert(n > 1);
-	vector<double>ar(n);
-	double delta = (r - l) / n;
-	double start = l;
-	for (int i = 0; i < n; i++)
-	{
-		ar[i] = f(start);
-		start += delta;
-	}
-	return move(ar);
-}
+using funcPeriodic = double(double, double); //x, middle
 
 class FourierFunction
 {
-	vector<double> A;
-	vector<double> B;
+	vec A;
+	vec B;
 	int n;
 	int m;
+	int mStart;
+	int mEnd;
 	double start;
 	double end;
-	double normCoeff =1.0;
+	double normCoeff = 1.0;
 	double normTerm = 0;
 	double gd(int n)
 	{
@@ -49,7 +28,7 @@ class FourierFunction
 		return res;
 	}
 public:
-	FourierFunction(){}
+	FourierFunction() {}
 	void changeX(double &x) const
 	{
 		x += normTerm;
@@ -74,7 +53,7 @@ public:
 		{
 			A += y[j] * cos(i *j * 2 * pi / n);
 		}
-		A *= (2.0/n);
+		A *= (2.0 / n);
 		return A;
 	}
 	double getB(int i, const double *y)
@@ -93,10 +72,10 @@ public:
 		this->m = m;
 		this->start = start;
 		this->end = end;
-		normCoeff = 2*pi/(end - start);
+		normCoeff = 2 * pi / (end - start);
 		normTerm = -start;
-		A = vector<double>(m+1);
-		B = vector<double>(m+1);
+		A = vec(m + 1);
+		B = vec(m + 1);
 		for (int i = 0; i <= m; i++)
 		{
 			A[i] = getA(i, y);
@@ -108,9 +87,9 @@ public:
 		changeX(x);
 		return calc(x);
 	}
-	void setPoints(int n, vector<double> &v)
+	void setPoints(int n, vec &v)
 	{
-		v = vector<double>(n);
+		v = vec(n);
 		double x = 0, delta = gd(n);
 		for (int i = 0; i < n; i++)
 		{
@@ -119,27 +98,3 @@ public:
 		}
 	}
 };
-int main()
-{
-	double start = 0;
-	double end = 2*pi;
-	int n = 101;
-	vector<double> ar = setPointFunct(n, start, end, g);
-	
-	ofstream of;
-	openForWrite(of, "sinX", true);
-	writePoints(n, &ar[0], of);
-	of.close();
-	FourierFunction fourierFunction;
-	int m = n/2;
-
-	fourierFunction.setCoeff(n, m,start, end, &ar[0]);
-	fourierFunction.setPoints(n, ar);
-	openForWrite(of, "sinXFourier", true);
-	writePoints(n, &ar[0], of);
-	
-	cout << fourierFunction.calculate(pi);
-
-	//of.close();
-	return 0;
-}
