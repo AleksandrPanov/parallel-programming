@@ -33,7 +33,7 @@ class FourierFunction
 	vec B;
 	int n;
 	int m;
-	int endM;
+	int startM;
 	double l;
 	double r;
 	double normCoeff =1.0;
@@ -44,9 +44,11 @@ class FourierFunction
 	}
 	double calc(double x) const
 	{
-		double res = A[0] / 2;
-		for (int i = 1; i <= m; i++)
+		double res = 0;
+		for (int i = startM; i <= m; i++)
 			res += getMemberSeries(i, x);
+		if (startM == 0)
+			res -= A[0] / 2;
 		return res;
 	}
 public:
@@ -59,14 +61,6 @@ public:
 	double getMemberSeries(int i, double x) const
 	{
 		return A[i] * cos(i*x) + B[i] * sin(i*x);
-	}
-	double getA0(const double *y)
-	{
-		double A0 = 0, x = 0, delta = gd(n);
-		for (int j = 0; j < n; j++)
-			A0 += y[j];
-		A0 *= (2.0 / n);
-		return A0;
 	}
 	double getA(int i, const double *y)
 	{
@@ -90,7 +84,7 @@ public:
 	}
 	void setCoeff(int n, int m, int startM,  double l, double r, const double *y)
 	{
-		this->endM = endM;
+		this->startM = startM;
 		this->n = n;
 		this->m = m;
 		this->l = l;

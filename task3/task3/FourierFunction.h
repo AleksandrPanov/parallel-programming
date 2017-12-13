@@ -10,10 +10,9 @@ class FourierFunction
 	vec B;
 	int n;
 	int m;
-	int mStart;
-	int mEnd;
-	double start;
-	double end;
+	int startM;
+	double l;
+	double r;
 	double normCoeff = 1.0;
 	double normTerm = 0;
 	double gd(int n)
@@ -22,8 +21,9 @@ class FourierFunction
 	}
 	double calc(double x) const
 	{
-		double res = A[0] / 2;
-		for (int i = 1; i <= m; i++)
+		double res = (startM != 0 ? 0 : A[0] / 2);
+		int start = (startM != 0 ? startM : 1);
+		for (int i = start; i <= m; i++)
 			res += getMemberSeries(i, x);
 		return res;
 	}
@@ -37,14 +37,6 @@ public:
 	double getMemberSeries(int i, double x) const
 	{
 		return A[i] * cos(i*x) + B[i] * sin(i*x);
-	}
-	double getA0(const double *y)
-	{
-		double A0 = 0, x = 0, delta = gd(n);
-		for (int j = 0; j < n; j++)
-			A0 += y[j];
-		A0 *= (2.0 / n);
-		return A0;
 	}
 	double getA(int i, const double *y)
 	{
@@ -66,20 +58,21 @@ public:
 		B *= (2.0 / n);
 		return B;
 	}
-	void setCoeff(int n, int m, double start, double end, const double *y)
+	void setCoeff(int n, int m, int startM, double l, double r, const double *y)
 	{
+		this->startM = startM;
 		this->n = n;
 		this->m = m;
-		this->start = start;
-		this->end = end;
-		normCoeff = 2 * pi / (end - start);
-		normTerm = -start;
+		this->l = l;
+		this->r = r;
+		normCoeff = 2 * pi / (r - l);
+		normTerm = -l;
 		A = vec(m + 1);
 		B = vec(m + 1);
 		for (int i = 0; i <= m; i++)
 		{
-			A[i] = getA(i, y);
-			B[i] = getB(i, y);
+			A[i] = getA(i + startM, y);
+			B[i] = getB(i + startM, y);
 		}
 	}
 	double calculate(double x) const
@@ -96,5 +89,13 @@ public:
 			v[i] = calc(x);
 			x += delta;
 		}
+	}
+	int getStartM(int rank, int size, int allM)
+	{
+		return (allM / size) * rank;
+	}
+	int getM(int rank, int size, int allM)
+	{
+		return ( (rank != size - 1) ? (allM / size) : (allM / size + allM % size) );
 	}
 };
