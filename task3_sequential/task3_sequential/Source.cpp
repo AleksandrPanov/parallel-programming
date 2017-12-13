@@ -8,7 +8,7 @@ const double pi = 3.14159265358979323846;
 using func = double(double);
 func *f = sin;
 func *g = [](double x)
-{
+{ 
 	if (x < pi)
 	return x;
 	else return 2 * pi - x;
@@ -18,23 +18,24 @@ vector<double> setPointFunct(int n, double l, double r, func f)
 	assert(n > 1);
 	vector<double>ar(n);
 	double delta = (r - l) / n;
-	double start = l;
+	double x = l;
 	for (int i = 0; i < n; i++)
 	{
-		ar[i] = f(start);
-		start += delta;
+		ar[i] = f(x);
+		x += delta;
 	}
 	return move(ar);
 }
-
+typedef vector<double> vec;
 class FourierFunction
 {
-	vector<double> A;
-	vector<double> B;
+	vec A;
+	vec B;
 	int n;
 	int m;
-	double start;
-	double end;
+	int endM;
+	double l;
+	double r;
 	double normCoeff =1.0;
 	double normTerm = 0;
 	double gd(int n)
@@ -87,20 +88,21 @@ public:
 		B *= (2.0 / n);
 		return B;
 	}
-	void setCoeff(int n, int m, double start, double end, const double *y)
+	void setCoeff(int n, int m, int startM,  double l, double r, const double *y)
 	{
+		this->endM = endM;
 		this->n = n;
 		this->m = m;
-		this->start = start;
-		this->end = end;
-		normCoeff = 2*pi/(end - start);
-		normTerm = -start;
-		A = vector<double>(m+1);
-		B = vector<double>(m+1);
+		this->l = l;
+		this->r = r;
+		normCoeff = 2*pi/(r - l);
+		normTerm = -l;
+		A = vec(m+1);
+		B = vec(m+1);
 		for (int i = 0; i <= m; i++)
 		{
-			A[i] = getA(i, y);
-			B[i] = getB(i, y);
+			A[i] = getA(i + startM, y);
+			B[i] = getB(i + startM, y);
 		}
 	}
 	double calculate(double x) const
@@ -108,9 +110,9 @@ public:
 		changeX(x);
 		return calc(x);
 	}
-	void setPoints(int n, vector<double> &v)
+	void setPoints(int n, vec &v)
 	{
-		v = vector<double>(n);
+		v = vec(n);
 		double x = 0, delta = gd(n);
 		for (int i = 0; i < n; i++)
 		{
@@ -121,10 +123,10 @@ public:
 };
 int main()
 {
-	double start = 0;
-	double end = 2*pi;
-	int n = 101;
-	vector<double> ar = setPointFunct(n, start, end, g);
+	double l = 0;
+	double r = 2*pi;
+	int n = 1001;
+	vector<double> ar = setPointFunct(n, l, r, g);
 	
 	ofstream of;
 	openForWrite(of, "sinX", true);
@@ -133,7 +135,7 @@ int main()
 	FourierFunction fourierFunction;
 	int m = n/2;
 
-	fourierFunction.setCoeff(n, m,start, end, &ar[0]);
+	fourierFunction.setCoeff(n, m, 0,  l, r, &ar[0]);
 	fourierFunction.setPoints(n, ar);
 	openForWrite(of, "sinXFourier", true);
 	writePoints(n, &ar[0], of);
