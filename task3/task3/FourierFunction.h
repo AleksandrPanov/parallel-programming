@@ -2,8 +2,9 @@
 #include "vec.h"
 double const pi = 3.14159265358979323846;
 using func = double(double);
-using funcPeriodic = double(double, double); //x, middle
-
+using funcPeriodic = double(func f, double, double, double); //func, x, middle, end
+#include <iostream>
+using namespace std;
 class FourierFunction
 {
 	vec A;
@@ -21,10 +22,13 @@ class FourierFunction
 	}
 	double calc(double x) const
 	{
+		cout << A[0] / 2<<'\n';
 		double res = (startM != 0 ? 0 : A[0] / 2);
-		int start = (startM != 0 ? startM : 1);
+		int start = (startM != 0 ? 0 : 1); //start == 0 or start == 1
 		for (int i = start; i <= m; i++)
+		{
 			res += getMemberSeries(i, x);
+		}
 		return res;
 	}
 public:
@@ -36,7 +40,7 @@ public:
 	}
 	double getMemberSeries(int i, double x) const
 	{
-		return A[i] * cos(i*x) + B[i] * sin(i*x);
+		return A[i] * cos((i + startM)*x) + B[i] * sin((i+startM)*x);
 	}
 	double getA(int i, const double *y)
 	{
@@ -92,10 +96,18 @@ public:
 	}
 	int getStartM(int rank, int size, int allM)
 	{
-		return (allM / size) * rank;
+		return ((allM + 1) / size) * rank + rank;
 	}
 	int getM(int rank, int size, int allM)
 	{
-		return ( (rank != size - 1) ? (allM / size) : (allM / size + allM % size) );
+		return ( (rank != size - 1) ? ((allM + 1) / size) : ((allM + 1) / size + (allM + 1) % size) );
+	}
+	int getM()
+	{
+		return m;
+	}
+	int getStartM()
+	{
+		return startM;
 	}
 };

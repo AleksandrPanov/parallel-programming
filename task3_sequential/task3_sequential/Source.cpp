@@ -33,7 +33,7 @@ class FourierFunction
 	vec B;
 	int n;
 	int m;
-	int startM;
+
 	double l;
 	double r;
 	double normCoeff =1.0;
@@ -45,10 +45,10 @@ class FourierFunction
 	double calc(double x) const
 	{
 		double res = 0;
-		for (int i = startM; i <= m; i++)
+		res = A[0] / 2;
+		cout << res<<'\n';
+		for (int i = 1; i <= m; i++)
 			res += getMemberSeries(i, x);
-		if (startM == 0)
-			res -= A[0] / 2;
 		return res;
 	}
 public:
@@ -82,9 +82,8 @@ public:
 		B *= (2.0 / n);
 		return B;
 	}
-	void setCoeff(int n, int m, int startM,  double l, double r, const double *y)
+	void setCoeff(int n, int m,  double l, double r, const double *y)
 	{
-		this->startM = startM;
 		this->n = n;
 		this->m = m;
 		this->l = l;
@@ -95,8 +94,8 @@ public:
 		B = vec(m+1);
 		for (int i = 0; i <= m; i++)
 		{
-			A[i] = getA(i + startM, y);
-			B[i] = getB(i + startM, y);
+			A[i] = getA(i, y);
+			B[i] = getB(i, y);
 		}
 	}
 	double calculate(double x) const
@@ -127,14 +126,14 @@ int main()
 	writePoints(n, &ar[0], of);
 	of.close();
 	FourierFunction fourierFunction;
-	int m = n/2;
+	int m = 5;
 
-	fourierFunction.setCoeff(n, m, 0,  l, r, &ar[0]);
-	fourierFunction.setPoints(n, ar);
-	openForWrite(of, "sinXFourier", true);
-	writePoints(n, &ar[0], of);
+	fourierFunction.setCoeff(n, m, l, r, &ar[0]);
+	//fourierFunction.setPoints(n, ar);
+	//openForWrite(of, "sinXFourier", true);
+	//writePoints(n, &ar[0], of);
 	
-	cout << fourierFunction.calculate(pi);
+	cout << fourierFunction.calculate(1);
 
 	//of.close();
 	return 0;

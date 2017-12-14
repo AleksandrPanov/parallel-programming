@@ -5,7 +5,7 @@ private:
 	double *p = 0;
 	int n = 0;
 public:
-	int size() { return n; }
+	int size() const { return n; }
 	vec(){}
 	vec(int size) : n(size)
 	{
