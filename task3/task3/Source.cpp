@@ -8,7 +8,7 @@
 using std::cout;
 func *f = [](double x)
 {
-	return x;
+	return  sin(x) + cos(x);
 };
 funcPeriodic *g = [](func f, double x, double middle, double end)
 {
@@ -46,12 +46,21 @@ void PostAllData(int n, vec &points)
 {
 	MPI_Bcast(points.getP(), n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 }
+void calculate(FourierFunction &four, double x, double &res, double &allRes)
+{
+	res = four.calculate(x);
+	MPI_Reduce(&res, &allRes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+}
+void setPoint(FourierFunction &f)
+{
+
+}
 int main(int argc, char **argv)
 {
-	int rank, size, n = 10001, m;
+	int rank, size, n = 11, m;
 	vec points;
 	FourierFunction fourierFunction;
-	double lr[2] = { 0, 2 * pi }, startTime, endTime, res = 0, x = 1, allRes = 0;
+	double lr[2] = { 0, 2 * pi }, startTime, endTime, res = 0, x = pi/4, allRes = 0;
 	if (argc > 1)
 	{
 		n = atoi(argv[1]);
@@ -59,21 +68,24 @@ int main(int argc, char **argv)
 	m = n/2 + 1;
 
 	MPI_Start(argc, argv, size, rank);
-	FillData(n, points, lr[0], lr[1], f, g, rank);
+	FillData(n, points, lr[0], lr[1], f, 0, rank);
 	PostAllData(n, points);
 	if (rank == 0)
 		startTime = MPI_Wtime();
 	fourierFunction.setCoeff(n, fourierFunction.getM(rank, size, m), fourierFunction.getStartM(rank, size, m), lr[0], lr[1], points.getP());
-	res = fourierFunction.calculate(x);
-	MPI_Reduce(&res, &allRes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	//res = fourierFunction.calculate(x);
+	//MPI_Reduce(&res, &allRes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+	calculate(fourierFunction, x, res, allRes);
 	if (rank == 0)
 	{
 		endTime = MPI_Wtime() - startTime;
 		cout << "time =  " <<endTime << " res in point x = "<<x<<" is "<<allRes<<'\n';
-		/*ofstream of;
+		/*
+		ofstream of;
 		fourierFunction.setPoints(n, points);
 		openForWrite(of, "sinXFourier", true);
-		writePoints(n, points.getP(), of);*/
+		writePoints(n, points.getP(), of);
+		*/
 	}
 	MPI_Finalize();
 	return 0;
