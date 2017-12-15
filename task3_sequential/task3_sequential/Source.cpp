@@ -46,7 +46,6 @@ class FourierFunction
 	{
 		double res = 0;
 		res = A[0] / 2;
-		cout << res<<'\n';
 		for (int i = 1; i <= m; i++)
 			res += getMemberSeries(i, x);
 		return res;
@@ -97,6 +96,9 @@ public:
 			A[i] = getA(i, y);
 			B[i] = getB(i, y);
 		}
+		/*for (int i = 0; i <= m; i++)
+			cout << A[i];
+		cout << '\n';*/
 	}
 	double calculate(double x) const
 	{
@@ -126,7 +128,7 @@ int main()
 	writePoints(n, &ar[0], of);
 	of.close();
 	FourierFunction fourierFunction;
-	int m = 5;
+	int m = 12;
 
 	fourierFunction.setCoeff(n, m, l, r, &ar[0]);
 	//fourierFunction.setPoints(n, ar);

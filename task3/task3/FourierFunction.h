@@ -20,12 +20,21 @@ class FourierFunction
 	{
 		return 2 * pi / n;
 	}
+	int AmoreB(int a, int b)
+	{
+		if (a > b) return 1;
+		return 0;
+	}
 	double calc(double x) const
 	{
-		cout << A[0] / 2<<'\n';
-		double res = (startM != 0 ? 0 : A[0] / 2);
-		int start = (startM != 0 ? 0 : 1); //start == 0 or start == 1
-		for (int i = start; i <= m; i++)
+		double res = 0;
+		int start = 0;
+		if (startM == 0)
+		{
+			res = A[0] / 2;
+			start = 1;
+		}
+		for (int i = start; i < m; i++)
 		{
 			res += getMemberSeries(i, x);
 		}
@@ -71,9 +80,9 @@ public:
 		this->r = r;
 		normCoeff = 2 * pi / (r - l);
 		normTerm = -l;
-		A = vec(m + 1);
-		B = vec(m + 1);
-		for (int i = 0; i <= m; i++)
+		A = vec(m);
+		B = vec(m);
+		for (int i = 0; i < m; i++)
 		{
 			A[i] = getA(i + startM, y);
 			B[i] = getB(i + startM, y);
@@ -96,11 +105,16 @@ public:
 	}
 	int getStartM(int rank, int size, int allM)
 	{
-		return ((allM + 1) / size) * rank + rank;
+		int m = getM(rank, size, allM);
+		if (AmoreB(allM % size, rank))
+		{
+			return (rank * m + rank);
+		}
+		return (rank * m + rank);
 	}
 	int getM(int rank, int size, int allM)
 	{
-		return ( (rank != size - 1) ? ((allM + 1) / size) : ((allM + 1) / size + (allM + 1) % size) );
+		return (allM/size + AmoreB(allM % size, rank));
 	}
 	int getM()
 	{
