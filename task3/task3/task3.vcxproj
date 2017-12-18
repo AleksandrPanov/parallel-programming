@@ -82,8 +82,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mpi\intel64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mpi\intel64\lib\release;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\Microsoft HPC Pack 2008 SDK\Include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\Microsoft HPC Pack 2008 SDK\Lib\amd64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -145,7 +145,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>impi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>msmpi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
