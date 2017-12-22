@@ -6,6 +6,12 @@ private:
 	int n = 0;
 public:
 	int size() const { return n; }
+	void resize(int size)
+	{
+		delete[] p;
+		n = size;
+		p = new double[n];
+	}
 	vec(){}
 	vec(int size) : n(size)
 	{

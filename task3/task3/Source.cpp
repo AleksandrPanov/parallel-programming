@@ -60,7 +60,7 @@ void calculate(FourierFunction &four, double x, double &res, double &allRes)
 }
 int main(int argc, char **argv)
 {
-	int rank, size, n = 20001, m, print = 0;
+	int rank, size, n = 11, m, print = 1;
 	vec points;
 	FourierFunction fourierFunction;
 	double lr[2] = { 0, 2 * pi }, startTime, endTime, res = 0, x = pi/2, allRes = 0;
@@ -72,10 +72,10 @@ int main(int argc, char **argv)
 			print = atoi(argv[2]);
 		}
 	}
-	m = n / 2 + 1;
+	m = n / 2;
 
 	MPI_Start(argc, argv, size, rank);
-	FillData(n, points, lr[0], lr[1], f, 0, rank, print);
+	FillData(n, points, lr[0], lr[1], sin, 0, rank, print);
 	PostAllData(n, points);
 	if (rank == 0)
 		startTime = MPI_Wtime();
@@ -88,9 +88,11 @@ int main(int argc, char **argv)
 		if (print)
 		{
 			ofstream of;
-			fourierFunction.setPoints(n, points);
+			int size = 4 * n;
+			points.resize(size);
+			fourierFunction.setPoints(size, points);
 			openForWrite(of, "out", true);
-			writePoints(n, points.getP(), of);
+			writePoints(size, points.getP(), of);
 		}
 		
 	}
